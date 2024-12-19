@@ -1,14 +1,16 @@
 import { createWebHistory, createRouter } from 'vue-router'
 import { auth } from './warehouse/auth'
-import Home from './components/Home.vue'   
-import Register from './components/Register.vue'
-import Login from './components/Login.vue'
+import Home from './views/Home.vue'   
+import Register from './views/Register.vue'
+import Login from './views/Login.vue'
+import TournamentView from './views/TournamentView.vue'
 import { authenticated } from './warehouse/store'
 
 const routes = [
   { path: '/', component: Home }, 
   { path: '/register', component: Register },
   { path: '/login', name: 'Login', component: Login },
+  { path: '/tournament', name: 'Tournament', component: TournamentView },
 
 ]
 

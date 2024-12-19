@@ -76,7 +76,7 @@
 
 <script>
 import { auth } from '../warehouse/auth';
-import socket from '../warehouse/socket'
+
 
 export default {
   data() {

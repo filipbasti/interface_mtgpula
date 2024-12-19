@@ -1,10 +1,11 @@
 import axios from "axios";
 import $router from "../router";
 
-const baseURL = "http://localhost:4000";
+const baseURL = "http://localhost:4000/api";
 let Service = axios.create({
   baseURL: baseURL,
   timeout: 10000000,
+  withCredentials: true,
 });
 Service.interceptors.response.use(
   (response) => {
@@ -15,12 +16,12 @@ Service.interceptors.response.use(
       auth.logout();
       $router.go();
     }
-    // console.error('Interceptor', error.response);
+     console.error('Interceptor', error.response);
   }
 );
 const auth = {
   async login(email, password) {
-    let response = await Service.post("/api/accounts/sign_in",
+    let response = await Service.post("/accounts/sign_in",
       { email: email, hash_password: password }
     );
     let user = response.data;
@@ -29,7 +30,7 @@ const auth = {
     return true;
   },
   async signup(userDetail) {
-    await Service.post("/api/accounts/create", {
+    await Service.post("/accounts/create", {
       account:{
       email: userDetail.email,
       full_name: userDetail.username,
@@ -54,6 +55,11 @@ const auth = {
       return true;
     } else return false;
   },
+
+  getUsers() {
+    const users = localStorage.getItem('users')
+    return users ? JSON.parse(users) : []
+  }
 };
 
 export { Service, auth, baseURL };

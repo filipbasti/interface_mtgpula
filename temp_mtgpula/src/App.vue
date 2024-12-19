@@ -15,6 +15,9 @@
         <li class="nav-item">
           <router-link class="nav-link" to="/about">About</router-link>
         </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/tournament">Tournament</router-link>
+        </li>
        
       </ul>
       <ul class="d-flex navbar-nav" > 
