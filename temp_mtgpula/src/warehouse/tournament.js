@@ -2,7 +2,7 @@ import { Service } from "./auth";
 
 const getAuthConfig = () => {
     const token = localStorage.getItem('token');
-    console.log('Current token:', token); // Debug line
+     // Debug line
     
     return {
         headers: {
@@ -16,7 +16,6 @@ const tournament = {
     async createTournament(data) {
         try {
             const config = getAuthConfig();
-            console.log('Request config:', config); // Debug line
             
             const response = await Service.post('/tournaments/create', data, config);
             return response.data;

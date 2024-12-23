@@ -69,10 +69,14 @@ export default {
     }
   },
   methods: {
-    handleCreateTournament() {
-     
-  tournament.createTournament({tournament:{...this.tournament}})  
-     console.log("uspio")
+   async handleCreateTournament() {
+     try {
+      let res = await tournament.createTournament({tournament:{...this.tournament}})  
+      this.$router.push("/tournament/active/"+ res.data.join_code)
+     }
+     catch (e){
+      alert(e)
+     }
       // Add your API call here
     },
     resetForm() {

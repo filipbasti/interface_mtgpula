@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import TournamentView from './views/TournamentView.vue'
+import CurrenTourView from './views/CurrenTourView.vue'
 import { authenticated } from './warehouse/store'
 
 const routes = [
@@ -11,7 +12,7 @@ const routes = [
   { path: '/register', component: Register },
   { path: '/login', name: 'Login', component: Login },
   { path: '/tournament', name: 'Tournament', component: TournamentView },
-
+  { path: '/tournament/active/:join_code', name: 'CurrenTour', component: CurrenTourView},
 ]
 
 const router = createRouter({
