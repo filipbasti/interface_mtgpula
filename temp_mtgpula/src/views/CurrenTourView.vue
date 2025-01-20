@@ -9,16 +9,20 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li v-for="player in activeUsers" :key="player.id" class="list-group-item d-flex justify-content-between align-items-center">
-                      {{ player.name }}
+                      <div class="d-flex  align-items-center w-100">
+                        <p class="mb-0 me-2"> {{ player.name }} </p>
+                        <div class="d-flex align-items-center">
+                          <span class="me-2">Deck:</span>
+                          <input type="text" class="form-control me-3" v-model="player.deck" style="width: 150px;">
+                        </div>
+                      </div>
                       <button @click="addUserToPlayersList(player)" class="btn btn-sm btn-outline-secondary">Add</button>
                     </li>
-                  
                 </ul>
             </div>
-           
         </div>
         <div class="col-md-6">
-            <PlayerList :players="activeUsers" />
+            <PlayerList :players="addedPlayers" />
             <button class="btn btn-primary mt-4" @click="startTournament">Start Tournament</button>
         </div>
     </div>
@@ -37,7 +41,8 @@ export default {
        return{
         channel: "",
         join_code: this.$route.params.join_code,
-        activeUsers: []
+        activeUsers: [],
+        addedPlayers: []
     } 
     },
     mounted(){
@@ -61,12 +66,20 @@ export default {
         this.channel.on("presence_diff", diff => {
             this.handlePresenceDiff(diff)
         })
+        this.channel.push("get_players", {}).receive("ok", (resp) => {
+            console.log("Players list:", resp);
+            this.addedPlayers = resp.map(player => ({name: player.user_id}))
+           
+        }) .receive("error", (resp) => {
+                console.error("Failed to start tournament:", resp);
+            });
     },
     methods: {
         addUserToPlayersList(player) {
-            this.channel.push("add_player", {user_id: player.id, deck: "undef"})
+            this.channel.push("add_player",{user_id: player.id, deck: player.deck})
             .receive("ok", (resp) => {
                 console.log("Player added:", resp);
+                this.addedPlayers.push({name: resp.full_name})
             })
             .receive("error", (resp) => {
                 console.error("Failed to add player:", resp);
