@@ -4,6 +4,9 @@
         <ul class="list-group">
             <li v-for="player in players" :key="player.id" class="list-group-item">
                 {{ player.name }}
+                <button @click="$emit('remove-player', player)" class="btn btn-danger btn-sm float-right">
+                   X
+                </button>
             </li>
         </ul>
     </div>

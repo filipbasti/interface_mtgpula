@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <PlayerList :players="addedPlayers" />
+            <PlayerList :players="addedPlayers" @remove-player="removePlayer" />
             <button class="btn btn-primary mt-4" @click="startTournament">Start Tournament</button>
         </div>
     </div>
@@ -32,7 +32,7 @@
 <script>    
 import socket from '../warehouse/socket';
 import PlayerList from '../components/PlayerList.vue';
-
+import {tournament_channel} from '../warehouse/tournament_channel';
 export default {
     components: {
         PlayerList
@@ -68,7 +68,7 @@ export default {
         })
         this.channel.push("get_players", {}).receive("ok", (resp) => {
             console.log("Players list:", resp);
-            this.addedPlayers = resp.map(player => ({name: player.user_id}))
+            this.addedPlayers = resp.map(player => ({name: player.id}))
            
         }) .receive("error", (resp) => {
                 console.error("Failed to start tournament:", resp);
@@ -76,23 +76,10 @@ export default {
     },
     methods: {
         addUserToPlayersList(player) {
-            this.channel.push("add_player",{user_id: player.id, deck: player.deck})
-            .receive("ok", (resp) => {
-                console.log("Player added:", resp);
-                this.addedPlayers.push({name: resp.full_name})
-            })
-            .receive("error", (resp) => {
-                console.error("Failed to add player:", resp);
-            });
+            tournament_channel.addUserToPlayersList(player, this.channel, this.addedPlayers)
         },
-        startTournament() {
-            this.channel.push("start_tournament", {})
-            .receive("ok", (resp) => {
-                console.log("Tournament started:", resp);
-            })
-            .receive("error", (resp) => {
-                console.error("Failed to start tournament:", resp);
-            });
+        removePlayer(player) {
+            tournament_channel.removePlayer(player, this.channel, this.addedPlayers)
         },
         handlePresenceState(state) {
             // Convert presence state to array of users
