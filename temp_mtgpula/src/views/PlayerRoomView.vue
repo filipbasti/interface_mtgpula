@@ -29,6 +29,11 @@ export default {
         .receive("error", (resp) => {
           console.log("Unable to join", resp)
         })
+        this.channel.on("matches_prepared", (payload) => {
+            console.log("Matches prepared:", payload);
+            // Handle the matches prepared event
+            // For example, you might want to update the state or notify the user
+        });
     }
 
 };

@@ -80,6 +80,9 @@ export default {
             });
     },
     methods: {
+        startTournament() {
+           tournament_channel.startTournament(this.channel)
+        },
         addUserToPlayersList(player) {
             tournament_channel.addUserToPlayersList(player, this.channel, this.addedPlayers)
         },

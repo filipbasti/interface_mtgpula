@@ -32,6 +32,15 @@ const tournament_channel = {
         .receive("error", (resp) => {
             console.error("Failed to remove player:", resp);
         });
+    },
+    startTournament(channel) {
+        channel.push("prepare_matches")
+        .receive("ok", (resp) => {
+            console.log("Tournament started:", resp);
+        })
+        .receive("error", (resp) => {
+            console.error("Failed to start tournament:", resp);
+        });
     }
 }
 export {tournament_channel};
