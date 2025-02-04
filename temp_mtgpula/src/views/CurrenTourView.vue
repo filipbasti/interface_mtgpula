@@ -22,6 +22,10 @@
             </div>
         </div>
         <div class="col-md-6">
+            <div class="mb-4">
+                <input type="text" v-model="searchEmail" class="form-control" placeholder="Search by email" @keyup.enter="searchUserByEmail">
+                <button class="btn btn-primary mt-2" @click="addUserbyEmail">Search</button>
+            </div>
             <PlayerList :players="addedPlayers" @remove-player="removePlayer" />
             <button class="btn btn-primary mt-4" @click="startTournament">Start Tournament</button>
         </div>
@@ -42,7 +46,8 @@ export default {
         channel: "",
         join_code: this.$route.params.join_code,
         activeUsers: [],
-        addedPlayers: []
+        addedPlayers: [],
+        searchEmail: ""
     } 
     },
     mounted(){
@@ -80,6 +85,18 @@ export default {
         },
         removePlayer(player) {
             tournament_channel.removePlayer(player, this.channel, this.addedPlayers)
+        },
+        searchUserByEmail() {
+            tournament_channel.getUserByEmail(this.searchEmail, this.channel)
+        },
+        async addUserbyEmail() {
+            try {
+                const userId = await tournament_channel.getUserByEmail(this.searchEmail, this.channel)
+                tournament_channel.addUserToPlayersList({id: userId, deck: "asdfasgfad"}, this.channel, this.addedPlayers)
+                // You can now add the user to the players list or perform other actions
+            } catch (error) {
+                console.error("Error finding user by email:", error)
+            }
         },
         handlePresenceState(state) {
             // Convert presence state to array of users

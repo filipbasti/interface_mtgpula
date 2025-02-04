@@ -5,14 +5,17 @@ import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import TournamentView from './views/TournamentView.vue'
 import CurrenTourView from './views/CurrenTourView.vue'
+import JoinTournamentview from './views/JoinTournamentview.vue'
 import { authenticated } from './warehouse/store'
-
+import PlayerRoom from './views/PlayerRoomView.vue'
 const routes = [
   { path: '/', component: Home }, 
   { path: '/register', component: Register },
   { path: '/login', name: 'Login', component: Login },
   { path: '/tournament', name: 'Tournament', component: TournamentView },
   { path: '/tournament/active/:join_code', name: 'CurrenTour', component: CurrenTourView},
+  {path: '/tournament/join', name: 'JoinTournament', component: JoinTournamentview},
+  { path: '/player-room/:join_code', name: 'PlayerRoom', component: PlayerRoom} 
 ]
 
 const router = createRouter({

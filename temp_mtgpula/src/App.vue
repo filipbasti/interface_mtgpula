@@ -16,7 +16,7 @@
           <router-link class="nav-link" to="/about">About</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/tournament">Tournament</router-link>
+          <router-link class="nav-link" to="/tournament/join">Tournament</router-link>
         </li>
        
       </ul>

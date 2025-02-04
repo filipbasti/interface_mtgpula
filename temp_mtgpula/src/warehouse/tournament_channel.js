@@ -1,4 +1,3 @@
-
 const tournament_channel = {
     addUserToPlayersList(player, channel, addedPlayers) {
         channel.push("add_player",{user_id: player.id, deck: player.deck})
@@ -8,6 +7,19 @@ const tournament_channel = {
         })
         .receive("error", (resp) => {
             console.error("Failed to add player:", resp);
+        });
+    },
+    getUserByEmail(email, channel) {
+        return new Promise((resolve, reject) => {
+            channel.push("get_user_by_email", { email: email })
+            .receive("ok", (resp) => {
+                console.log("Player found:", resp.user_id);
+                resolve(resp.user_id);
+            })
+            .receive("error", (resp) => {
+                console.error("Failed to find player:", resp);
+                reject(resp);
+            });
         });
     },
     removePlayer(player, channel, addedPlayers) {
@@ -21,5 +33,5 @@ const tournament_channel = {
             console.error("Failed to remove player:", resp);
         });
     }
- }
- export {tournament_channel};
+}
+export {tournament_channel};
