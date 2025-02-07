@@ -2,19 +2,42 @@
     <div>
         <h1>Welcome to the Tournament Room</h1>
         <p>Your join code: {{ joinCode }}</p>
+        {{ matches }}
+        {{ authenticated }}
     </div>
 </template>
 
 <script>
 import socket from '../warehouse/socket';
+import { tournament_channel } from '../warehouse/tournament_channel';
+import { auth } from '../warehouse/auth';
 export default {
     name: 'PlayerRoomView',
     data() {
         return {
-            joinCode: ''
+            joinCode: '',
+           matches: [],
+            channel: null,
+            authenticated: ""
         };
     },
-    created() {
+
+    methods: {
+        async getCurrentUser() {
+            try {
+                console.log("Getting current user");
+                let response = await auth.current_user();
+                console.log("Current user:", response);
+                this.authenticated = response;
+              
+            } catch (error) {
+                console.error(error);
+            }
+            
+        }
+    },
+   async mounted() {
+        await this.getCurrentUser();
         this.joinCode = this.$route.params.join_code;
         this.channel = socket.channel(`tournament:${this.$route.params.join_code}`)
         this.channel
@@ -34,7 +57,9 @@ export default {
             // Handle the matches prepared event
             // For example, you might want to update the state or notify the user
         });
+       this.matches = await tournament_channel.getCurrentMatches(this.channel)
     }
+ 
 
 };
 </script>

@@ -41,6 +41,20 @@ const tournament_channel = {
         .receive("error", (resp) => {
             console.error("Failed to start tournament:", resp);
         });
+    },
+   getCurrentMatches(channel) {
+       return new Promise((resolve, reject ) => 
+        channel.push("current_matches")
+       .receive("ok", (resp) => {
+           console.log("Matches found:", resp.matches);
+           resolve(resp.matches);
+          
+           
+       })
+       .receive("error", (resp) => {
+           console.error("Failed to get matches:", resp);
+           reject(resp);
+       }));
     }
 }
 export {tournament_channel};

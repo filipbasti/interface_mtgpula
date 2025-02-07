@@ -19,6 +19,19 @@ Service.interceptors.response.use(
      console.error('Interceptor', error.response);
   }
 );
+
+
+const getAuthConfig = () => {
+  const token = localStorage.getItem('token');
+   // Debug line
+  
+  return {
+      headers: {
+          Authorization: `Bearer ${token}`
+          
+      }
+  };
+};
 const auth = {
   async login(email, password) {
     let response = await Service.post("/accounts/sign_in",
@@ -42,6 +55,13 @@ const auth = {
     return true;
   },
 
+  async current_user() {
+      try{
+    let response = await Service.get("/accounts/current", getAuthConfig());
+    return response.data;}
+    catch(error){ console.error('Current user error:', 
+      error.response?.data || error);}
+  },
   logout() {
     localStorage.removeItem("token");
   },
