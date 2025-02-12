@@ -23,7 +23,8 @@ const tournament = {
             console.error('Tournament creation error:', error.response?.data || error);
             throw error;
         }
-    }
+    },
+
 };
 
 export { tournament };

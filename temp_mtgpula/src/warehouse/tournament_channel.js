@@ -55,6 +55,17 @@ const tournament_channel = {
            console.error("Failed to get matches:", resp);
            reject(resp);
        }));
+    },
+    updateMatch(channel, match_params) {
+        return new Promise ((resolve, reject ) => channel.push("update_match", match_params)
+        .receive("ok", (resp) => {
+            console.log("Match updated:", resp);
+            resolve(resp);
+        })
+        .receive("error", (resp) => {
+            console.error("Failed to update match:", resp);
+            reject(resp);
+        }));
     }
 }
 export {tournament_channel};
