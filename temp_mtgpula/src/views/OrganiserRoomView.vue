@@ -2,38 +2,22 @@
     <div class="container mt-4">
         <h1 class="text-center">Tournament Management</h1>
         <p class="text-center">Your join code: <strong>{{ joinCode }}</strong></p>
-        <div v-if="matches.length" class="card shadow-sm mt-4">
-            <div class="card-body">
-                <h2 class="card-title">All Rounds</h2>
-                <div v-for="match in matches" :key="match.id" class="mb-4">
-                    <h3>Round {{ match.round }}</h3>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h4>Player 1: {{ match.player1.user.full_name }}</h4>
-                            <div class="mb-3">
-                                <label for="player1Score" class="form-label">Player 1 Score:</label>
-                                <input type="number" v-model="match.player_1_wins" id="player1Score" class="form-control" />
-                            </div>
-                            <div class="form-check mb-3">
-                                <input type="checkbox" v-model="match.player1OnPlay" id="player1OnPlay" class="form-check-input" />
-                                <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h4>Player 2: {{ match.player2.user.full_name }}</h4>
-                            <div class="mb-3">
-                                <label for="player2Score" class="form-label">Player 2 Score:</label>
-                                <input type="number" v-model="match.player_2_wins" id="player2Score" class="form-control" />
-                            </div>
-                            <div class="form-check mb-3">
-                                <input type="checkbox" v-model="match.player2OnPlay" id="player2OnPlay" class="form-check-input" />
-                                <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
-                            </div>
+        <div v-if="matches.length">
+            <div class="accordion" id="accordionExample">
+                <div v-for="(match, index) in matches" :key="match.id" class="accordion-item">
+                    <h2 class="accordion-header" :id="'heading' + index">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="true" :aria-controls="'collapse' + index">
+                            Match {{ index + 1 }}: {{ match.player1.user.full_name }} vs {{ match.player2.user.full_name }}
+                        </button>
+                    </h2>
+                    <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <MatchDetails :match="match" :channel="channel" @update-match="updateMatch" />
                         </div>
                     </div>
-                    <button class="btn btn-primary mt-4 w-100" @click="submitScores(match)">Submit Scores</button>
                 </div>
             </div>
+            <button class="btn btn-secondary mt-4 w-100" @click="goToNextRound">Next Round</button>
         </div>
     </div>
 </template>
@@ -42,9 +26,13 @@
 import socket from '../warehouse/socket';
 import { tournament_channel } from '../warehouse/tournament_channel';
 import { auth } from '../warehouse/auth';
+import MatchDetails from '../components/MatchDetails.vue';
 
 export default {
     name: 'OrganiserRoomView',
+    components: {
+        MatchDetails
+    },
     data() {
         return {
             joinCode: '',
@@ -52,18 +40,6 @@ export default {
             channel: null,
             authenticated: ""
         };
-    },
-    watch: {
-        'matches.player1OnPlay'(newVal) {
-            if (newVal) {
-                this.matches.player2OnPlay = false;
-            }
-        },
-        'matches.player2OnPlay'(newVal) {
-            if (newVal) {
-                this.matches.player1OnPlay = false;
-            }
-        }
     },
     methods: {
         async getCurrentUser() {
@@ -88,23 +64,19 @@ export default {
                 console.error(e);
             }
         },
-        async submitScores(match) {
+        async updateMatch(params) {
             try {
-                let params = {
-                    id: match.id,
-                    player_1_wins: match.player_1_wins,
-                    player_2_wins: match.player_2_wins,
-                    on_play_id: match.player1OnPlay ? match.player1.id : match.player2.id
-                };
-              
-                console.log("Submitting scores:", params);
+                console.log("Updating match:", params);
                 await tournament_channel.updateMatch(this.channel, params);
             } catch (error) {
-                console.error("Error submitting scores:", error);
+                console.error("Error updating match:", error);
             }
         },
-        startTournament() {
-            tournament_channel.startTournament(this.channel);
+        async goToNextRound() {
+            // Logic to go to the next round
+            console.log("Going to the next round");
+            await tournament_channel.prepareRound(this.channel);
+            this.matches = await this.getAllMatches();
         }
     },
     async mounted() {

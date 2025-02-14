@@ -33,13 +33,14 @@ const tournament_channel = {
             console.error("Failed to remove player:", resp);
         });
     },
-    startTournament(channel) {
+    prepareRound(channel) {
         channel.push("prepare_matches")
         .receive("ok", (resp) => {
             console.log("Tournament started:", resp);
         })
         .receive("error", (resp) => {
             console.error("Failed to start tournament:", resp);
+            resp.redirect==true ? window.location.href = "/tournament" : null;
         });
     },
    getCurrentMatches(channel) {
