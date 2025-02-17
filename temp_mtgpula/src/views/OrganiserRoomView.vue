@@ -35,6 +35,7 @@ export default {
     },
     data() {
         return {
+            standings: [],
             joinCode: '',
             matches: [],
             channel: null,
@@ -48,6 +49,16 @@ export default {
                 this.authenticated = response;
             } catch (error) {
                 console.error(error);
+            }
+        },
+        async getStandinghs() {
+            try {
+                let standings = await tournament_channel.getStandings(this.channel);
+                console.log(standings);
+                this.standings = standings;
+                return standings;
+            } catch (e) {
+                console.error(e);
             }
         },
         async getAllMatches() {
@@ -101,6 +112,7 @@ export default {
             // For example, you might want to update the state or notify the user
         });
         this.matches = await this.getAllMatches();
+        await this.getStandinghs();
     }
 };
 </script>

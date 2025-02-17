@@ -7,10 +7,10 @@
                     <h4>Player 1: {{ match.player1.user.full_name }}</h4>
                     <div class="mb-3">
                         <label for="player1Score" class="form-label">Player 1 Score:</label>
-                        <input type="number" v-model="match.player_1_wins" id="player1Score" class="form-control" :disabled="match.player1.had_bye || match.player2.had_bye" />
+                        <input type="number" v-model="match.player_1_wins" id="player1Score" class="form-control" :disabled="match.player2.id == null" />
                     </div>
                     <div class="form-check mb-3">
-                        <input type="checkbox" v-model="match.player1OnPlay" @change="handleOnPlayChange('player1')" id="player1OnPlay" class="form-check-input" :disabled="match.player1.had_bye || match.player2.had_bye" />
+                        <input type="checkbox" v-model="match.player1OnPlay" @change="handleOnPlayChange('player1')" id="player1OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
                         <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
                     </div>
                 </div>
@@ -18,15 +18,15 @@
                     <h4>Player 2: {{ match.player2.user.full_name }}</h4>
                     <div class="mb-3">
                         <label for="player2Score" class="form-label">Player 2 Score:</label>
-                        <input type="number" v-model="match.player_2_wins" id="player2Score" class="form-control" :disabled="match.player1.had_bye || match.player2.had_bye" />
+                        <input type="number" v-model="match.player_2_wins" id="player2Score" class="form-control" :disabled=" match.player2.id == null" />
                     </div>
                     <div class="form-check mb-3">
-                        <input type="checkbox" v-model="match.player2OnPlay" @change="handleOnPlayChange('player2')" id="player2OnPlay" class="form-check-input" :disabled="match.player1.had_bye || match.player2.had_bye" />
+                        <input type="checkbox" v-model="match.player2OnPlay" @change="handleOnPlayChange('player2')" id="player2OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
                         <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
                     </div>
                 </div>
             </div>
-            <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled="match.player1.had_bye || match.player2.had_bye">Submit Scores</button>
+            <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled="match.player2.id == null">Submit Scores</button>
         </div>
     </div>
 </template>

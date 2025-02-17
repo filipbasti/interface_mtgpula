@@ -107,7 +107,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit() {
+    async handleSubmit() {
       // Add your registration logic here
       if(this.password !== this.confirmPassword){
         alert("Passwords do not match");
@@ -120,7 +120,7 @@ export default {
       }
     
       try{
-      auth.signup(userDetail)
+     await auth.signup(userDetail)
       this.$router.push('/');
       }catch(error){
         console.error('Error during registration:', error);

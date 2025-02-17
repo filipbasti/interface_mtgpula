@@ -3,8 +3,8 @@
         <h1 class="my-4">Game Dashboard</h1>
         <ul class="list-group">
             <li v-for="player in players" :key="player.id" class="list-group-item">
-                {{ player.name }}
-                <button @click="$emit('remove-player', player)" class="btn btn-danger btn-sm float-right">
+                {{ player.user.full_name }}
+                <button @click="$emit('remove-player', player)" class="btn btn-danger btn-sm float-end">
                    X
                 </button>
             </li>

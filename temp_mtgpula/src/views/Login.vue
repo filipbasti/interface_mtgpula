@@ -88,11 +88,11 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
+   async handleLogin() {
       // Add your login logic here
 
       try {
-        auth.login(this.email, this.password)
+        await auth.login(this.email, this.password)
         this.$router.push('/');
        
      

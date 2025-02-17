@@ -1,9 +1,37 @@
 const tournament_channel = {
+
+    getPlayers(channel) { 
+        
+        return new Promise ((resolve, reject) => {
+        channel.push("get_players", {}).receive("ok", (resp) => {
+            console.log("Players found:", resp.players);
+            resolve(resp.players);
+       
+       
+    }) .receive("error", (resp) => {
+            console.error("Failed to start tournament:", resp);
+            reject(resp);
+        });})
+    },
+    getStandings(channel) { 
+            
+            return new Promise ((resolve, reject) => {
+            channel.push("get_standings", {}).receive("ok", (resp) => {
+                console.log("Standings found:", resp);
+                resolve(resp.players);
+        
+        
+        }) .receive("error", (resp) => {
+                console.error("Failed to get standings:", resp);
+                reject(resp);
+            });})
+    },
+
     addUserToPlayersList(player, channel, addedPlayers) {
         channel.push("add_player",{user_id: player.id, deck: player.deck})
         .receive("ok", (resp) => {
             console.log("Player added:", resp);
-            addedPlayers.push({name: resp.id})
+            addedPlayers.push(resp.player)
         })
         .receive("error", (resp) => {
             console.error("Failed to add player:", resp);
@@ -24,24 +52,27 @@ const tournament_channel = {
     },
     removePlayer(player, channel, addedPlayers) {
         console.log("Removing player:", player);
-        channel.push("remove_player",{player_id: player.name})
+        channel.push("remove_player",{player_id: player.id})
         .receive("ok", (resp) => {
             console.log("Player removed:", resp);
-            addedPlayers.splice(addedPlayers.findIndex(p => p.name === resp), 1)
+            addedPlayers.splice(addedPlayers.findIndex(p => p.id === resp.id), 1)
         })
         .receive("error", (resp) => {
             console.error("Failed to remove player:", resp);
         });
     },
     prepareRound(channel) {
+        return new Promise((resolve, reject) =>
         channel.push("prepare_matches")
         .receive("ok", (resp) => {
             console.log("Tournament started:", resp);
+            resolve(resp);
         })
         .receive("error", (resp) => {
             console.error("Failed to start tournament:", resp);
             resp.redirect==true ? window.location.href = "/tournament" : null;
-        });
+            reject(resp);
+        }));
     },
    getCurrentMatches(channel) {
        return new Promise((resolve, reject ) => 

@@ -23,7 +23,8 @@
         </div>
         <div class="col-md-6">
             <div class="mb-4">
-                <input type="text" v-model="searchEmail" class="form-control" placeholder="Search by email" @keyup.enter="searchUserByEmail">
+                <input type="text" v-model="searchEmail" class="form-control" placeholder="Search by email" @keyup.enter="addUserbyEmail">
+                <input type="text" v-model="deck" class="form-control" placeholder="Deck"  @keyup.enter="addUserbyEmail">
                 <button class="btn btn-primary mt-2" @click="addUserbyEmail">Search</button>
             </div>
             <PlayerList :players="addedPlayers" @remove-player="removePlayer" />
@@ -47,10 +48,11 @@ export default {
         join_code: this.$route.params.join_code,
         activeUsers: [],
         addedPlayers: [],
-        searchEmail: ""
+        searchEmail: "",
+        deck: ""
     } 
     },
-    mounted(){
+  async  mounted(){
         this.channel = socket.channel(`tournament:${this.join_code}`)
         this.channel
         .join()
@@ -71,17 +73,17 @@ export default {
         this.channel.on("presence_diff", diff => {
             this.handlePresenceDiff(diff)
         })
-        this.channel.push("get_players", {}).receive("ok", (resp) => {
-            console.log("Players list:", resp);
-            this.addedPlayers = resp.map(player => ({name: player.id}))
-           
-        }) .receive("error", (resp) => {
-                console.error("Failed to start tournament:", resp);
-            });
+        this.addedPlayers = await tournament_channel.getPlayers(this.channel, this.addedPlayers)
     },
     methods: {
-        startTournament() {
-           tournament_channel.prepareRound(this.channel)
+        async startTournament() {
+            try {
+                await tournament_channel.prepareRound(this.channel, this.addedPlayers);
+                console.log("Navigating to organiser-room with join_code:", this.join_code);
+                this.$router.push(`/organiser-room/${this.join_code}`);
+            } catch (error) {
+                console.error("Error starting tournament:", error);
+            }
         },
         addUserToPlayersList(player) {
             tournament_channel.addUserToPlayersList(player, this.channel, this.addedPlayers)
@@ -94,8 +96,8 @@ export default {
         },
         async addUserbyEmail() {
             try {
-                const userId = await tournament_channel.getUserByEmail(this.searchEmail, this.channel)
-                tournament_channel.addUserToPlayersList({id: userId, deck: "asdfasgfad"}, this.channel, this.addedPlayers)
+                const userId = await tournament_channel.getUserByEmail(this.searchEmail, this.channel, this.deck)
+                tournament_channel.addUserToPlayersList({id: userId, deck: this.deck}, this.channel, this.addedPlayers)
                 // You can now add the user to the players list or perform other actions
             } catch (error) {
                 console.error("Error finding user by email:", error)
