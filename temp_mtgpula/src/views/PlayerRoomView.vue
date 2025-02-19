@@ -2,34 +2,60 @@
     <div class="container mt-4">
         <h1 class="text-center">Welcome to the Tournament Room</h1>
         <p class="text-center">Your join code: <strong>{{ joinCode }}</strong></p>
-        <div v-if="currentMatch" class="card shadow-sm mt-4">
-            <div class="card-body">
-                <h2 class="card-title">Match Details</h2>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h3>Player 1: {{ currentMatch.player1.user.full_name }}</h3>
-                        <div class="mb-3">
-                            <label for="player1Score" class="form-label">Player 1 Score:</label>
-                            <input type="number" v-model="currentMatch.player_1_wins" id="player1Score" class="form-control" />
+        <ul class="nav nav-tabs" id="playerRoomTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="match-tab" data-bs-toggle="tab" data-bs-target="#match" type="button" role="tab" aria-controls="match" aria-selected="true">Match</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="standings-tab" data-bs-toggle="tab" data-bs-target="#standings" type="button" role="tab" aria-controls="standings" aria-selected="false">Standings</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="playerRoomTabsContent">
+            <div class="tab-pane fade show active" id="match" role="tabpanel" aria-labelledby="match-tab">
+                <div v-if="currentMatch && updateMatchFlag" class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h2 class="card-title">Match Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3>Player 1: {{ currentMatch.player1.user.full_name }}</h3>
+                                <div class="mb-3">
+                                    <label for="player1Score" class="form-label">Player 1 Score:</label>
+                                    <input type="number" v-model="currentMatch.player_1_wins" id="player1Score" class="form-control" />
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" v-model="player1OnPlay" id="player1OnPlay" class="form-check-input" />
+                                    <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3>Player 2: {{ currentMatch.player2.user.full_name }}</h3>
+                                <div class="mb-3">
+                                    <label for="player2Score" class="form-label">Player 2 Score:</label>
+                                    <input type="number" v-model="currentMatch.player_2_wins" id="player2Score" class="form-control" />
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" v-model="player2OnPlay" id="player2OnPlay" class="form-check-input" />
+                                    <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check mb-3">
-                            <input type="checkbox" v-model="player1OnPlay" id="player1OnPlay" class="form-check-input" />
-                            <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h3>Player 2: {{ currentMatch.player2.user.full_name }}</h3>
-                        <div class="mb-3">
-                            <label for="player2Score" class="form-label">Player 2 Score:</label>
-                            <input type="number" v-model="currentMatch.player_2_wins" id="player2Score" class="form-control" />
-                        </div>
-                        <div class="form-check mb-3">
-                            <input type="checkbox" v-model="player2OnPlay" id="player2OnPlay" class="form-check-input" />
-                            <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
-                        </div>
+                        <button class="btn btn-primary mt-4 w-100" @click="submitScores">Submit Scores</button>
                     </div>
                 </div>
-                <button class="btn btn-primary mt-4 w-100" @click="submitScores">Submit Scores</button>
+                <div v-else class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h2 class="card-title">Waiting for organiser to start a new round</h2>
+                        <p>Sit back and relax</p>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="standings" role="tabpanel" aria-labelledby="standings-tab">
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h2 class="card-title">Standings</h2>
+                        <StandingsTable :standings="standings" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -39,9 +65,13 @@
 import socket from '../warehouse/socket';
 import { tournament_channel } from '../warehouse/tournament_channel';
 import { auth } from '../warehouse/auth';
+import StandingsTable from '../components/StandingsTable.vue';
 
 export default {
     name: 'PlayerRoomView',
+    components: {
+        StandingsTable
+    },
     data() {
         return {
             joinCode: '',
@@ -50,7 +80,9 @@ export default {
             authenticated: "",
             currentMatch: null,
             player2OnPlay: false,
-            player1OnPlay: false
+            player1OnPlay: false,
+            standings: [],
+            updateMatchFlag: false
         };
     },
     watch: {
@@ -66,6 +98,11 @@ export default {
         }
     },
     methods: {
+        settingFlag(player1wins, player2wins){
+            if (player1wins == 0 && player2wins == 0){
+                return true;
+            }
+        },
         async getCurrentUser() {
             try {
                 let response = await auth.current_user();
@@ -80,8 +117,19 @@ export default {
                 let match = matches.find(match => match.player1.user.id === this.authenticated.user.id || match.player2.user.id === this.authenticated.user.id);
                 console.log(match);
                 this.currentMatch = match;
-                this.currentMatch.on_play_id == match.player1.id? this.player1OnPlay = true : this.player2OnPlay = true;
+                this.currentMatch.on_play_id == match.player1.id ? this.player1OnPlay = true : this.player2OnPlay = true;
+                this.updateMatchFlag = this.settingFlag(this.currentMatch.player_1_wins, this.currentMatch.player_2_wins);
                 return match;
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async getStandings() {
+            try {
+                let standings = await tournament_channel.getStandings(this.channel);
+                console.log(standings);
+                this.standings = standings;
+                return standings;
             } catch (e) {
                 console.error(e);
             }
@@ -108,7 +156,7 @@ export default {
     async mounted() {
         await this.getCurrentUser();
         this.joinCode = this.$route.params.join_code;
-        this.channel = socket.channel(`tournament:${this.$route.params.join_code}`);
+        this.channel = socket.channel(`tournament:${this.$route.params.join_code}`, {deck: this.$route.query.deck});
         this.channel
             .join()
             .receive("ok", (resp) => {
@@ -126,7 +174,13 @@ export default {
             // Handle the matches prepared event
             // For example, you might want to update the state or notify the user
         });
+        this.channel.on("match_updated", (payload) => {
+            console.log("Match updated:", payload);
+            if (payload.id === this.currentMatch.id) this.updateMatchFlag = false;
+            this.getStandings();
+        });
         this.currentMatch = await this.getCurrentPlayerMatch();
+        await this.getStandings();
     }
 };
 </script>

@@ -2,8 +2,20 @@
     <div class="container mt-4">
         <h1 class="text-center">Tournament Management</h1>
         <p class="text-center">Your join code: <strong>{{ joinCode }}</strong></p>
-        <div v-if="matches.length">
+        <div v-if="matches.length || standings.length">
             <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingStandings">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStandings" aria-expanded="true" aria-controls="collapseStandings">
+                            Standings
+                        </button>
+                    </h2>
+                    <div id="collapseStandings" class="accordion-collapse collapse show" aria-labelledby="headingStandings" data-bs-parent="#accordionExample">
+                       <div class="accordion-body">
+                        <StandingsTable :standings="standings" />
+                    </div>
+                    </div>
+                </div>
                 <div v-for="(match, index) in matches" :key="match.id" class="accordion-item">
                     <h2 class="accordion-header" :id="'heading' + index">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="true" :aria-controls="'collapse' + index">
@@ -27,11 +39,13 @@ import socket from '../warehouse/socket';
 import { tournament_channel } from '../warehouse/tournament_channel';
 import { auth } from '../warehouse/auth';
 import MatchDetails from '../components/MatchDetails.vue';
+import StandingsTable from '../components/StandingsTable.vue';
 
 export default {
     name: 'OrganiserRoomView',
     components: {
-        MatchDetails
+        MatchDetails,
+        StandingsTable
     },
     data() {
         return {
@@ -51,7 +65,7 @@ export default {
                 console.error(error);
             }
         },
-        async getStandinghs() {
+        async getStandings() {
             try {
                 let standings = await tournament_channel.getStandings(this.channel);
                 console.log(standings);
@@ -111,8 +125,12 @@ export default {
             // Handle the matches prepared event
             // For example, you might want to update the state or notify the user
         });
+        this.channel.on("match_updated", (payload) => {
+            console.log("Match updated:", payload);
+            this.getStandings();
+        });
         this.matches = await this.getAllMatches();
-        await this.getStandinghs();
+        await this.getStandings();
     }
 };
 </script>

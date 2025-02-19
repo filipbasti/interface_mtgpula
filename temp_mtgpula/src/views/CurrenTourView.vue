@@ -108,7 +108,8 @@ export default {
             console.log(state)
             this.activeUsers = Object.entries(state).map(([key, presence]) => ({
                 id: key,
-                name: presence.metas[0].user_name
+                name: presence.metas[0].user_name,
+                deck: presence.metas[0].deck
             }))
         },
         handlePresenceDiff(diff) {

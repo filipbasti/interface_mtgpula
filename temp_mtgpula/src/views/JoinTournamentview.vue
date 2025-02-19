@@ -7,6 +7,7 @@
                 <h3 class="card-title my-5">Join as a player</h3>
                 <p class="card-text my-5">Enter tournament code to enter</p>
                 <input type="text" v-model="playerRoomCode" class="form-control-sm me-2 mb-5" placeholder="Enter code">
+                <input type="text" v-model="playerDeck" class="form-control-sm me-2 mb-5" placeholder="Enter deck">
                 <a href="#" @click="joinPlayerRoom" class="btn btn-primary">Join</a>
             </div>
                 
@@ -41,7 +42,7 @@ export default {
             this.$router.push('/tournament/active/'+this.adminCode)
         },
         joinPlayerRoom(){
-            this.$router.push('/player-room/'+this.playerRoomCode)
+            this.$router.push({ path: '/player-room/' + this.playerRoomCode, query: { deck: this.playerDeck } })
         }
     },
     data(){
