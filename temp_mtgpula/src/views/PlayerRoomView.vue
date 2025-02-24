@@ -20,10 +20,10 @@
                                 <h3>Player 1: {{ currentMatch.player1.user.full_name }}</h3>
                                 <div class="mb-3">
                                     <label for="player1Score" class="form-label">Player 1 Score:</label>
-                                    <input type="number" v-model="currentMatch.player_1_wins" id="player1Score" class="form-control" />
+                                    <input type="number" v-model="currentMatch.player_1_wins" id="player1Score" class="form-control" :disabled=" currentMatch.player2.id == null == null" />
                                 </div>
                                 <div class="form-check mb-3">
-                                    <input type="checkbox" v-model="player1OnPlay" id="player1OnPlay" class="form-check-input" />
+                                    <input type="checkbox" v-model="player1OnPlay" id="player1OnPlay" class="form-check-input" :disabled=" currentMatch.player2.id == null == null"/>
                                     <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
                                 </div>
                             </div>
@@ -31,15 +31,15 @@
                                 <h3>Player 2: {{ currentMatch.player2.user.full_name }}</h3>
                                 <div class="mb-3">
                                     <label for="player2Score" class="form-label">Player 2 Score:</label>
-                                    <input type="number" v-model="currentMatch.player_2_wins" id="player2Score" class="form-control" />
+                                    <input type="number" v-model="currentMatch.player_2_wins" id="player2Score" class="form-control" :disabled=" currentMatch.player2.id == null == null"/>
                                 </div>
                                 <div class="form-check mb-3">
-                                    <input type="checkbox" v-model="player2OnPlay" id="player2OnPlay" class="form-check-input" />
+                                    <input type="checkbox" v-model="player2OnPlay" id="player2OnPlay" class="form-check-input" :disabled=" currentMatch.player2.id == null == null"/>
                                     <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary mt-4 w-100" @click="submitScores">Submit Scores</button>
+                        <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled=" currentMatch.player2.id == null">Submit Scores</button>
                     </div>
                 </div>
                 <div v-else class="card shadow-sm mt-4">
@@ -171,8 +171,8 @@ export default {
             });
         this.channel.on("matches_prepared", (payload) => {
             console.log("Matches prepared:", payload);
-            // Handle the matches prepared event
-            // For example, you might want to update the state or notify the user
+          
+            this.currentMatch = this.getCurrentPlayerMatch();
         });
         this.channel.on("match_updated", (payload) => {
             console.log("Match updated:", payload);
