@@ -1,6 +1,6 @@
 import axios from "axios";
 import $router from "../router";
-
+import socketService from "./socketService";
 const baseURL = "http://localhost:4000/api";
 let Service = axios.create({
   baseURL: baseURL,
@@ -13,8 +13,7 @@ Service.interceptors.response.use(
   },
   (error) => {
     if (error.response.status == 401) {
-      auth.logout();
-      $router.go();
+      auth.refreshToken();
     }
      console.error('Interceptor', error.response);
   }
@@ -33,12 +32,28 @@ const getAuthConfig = () => {
   };
 };
 const auth = {
+
+  async refreshToken() {
+    try{
+    let response = await Service.post("/accounts/refresh_session", {}, getAuthConfig());
+    localStorage.setItem("token", response.token);
+    $router.go();
+    return response.token;
+    }
+    catch(error){
+      auth.logout();
+      $router.go();
+      throw error;
+     }
+
+  },
   async login(email, password) {
     let response = await Service.post("/accounts/sign_in",
       { email: email, hash_password: password }
     );
     let user = response.data;
     localStorage.setItem("token", user.token);
+    socketService.connect(user.token);
 
     return true;
   },

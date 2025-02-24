@@ -1,103 +1,97 @@
+import socketService from "./socketService";
+
 const tournament_channel = {
-
-    getPlayers(channel) { 
-        
-        return new Promise ((resolve, reject) => {
-        channel.push("get_players", {}).receive("ok", (resp) => {
-            console.log("Players found:", resp.players);
-            resolve(resp.players);
-       
-       
-    }) .receive("error", (resp) => {
-            console.error("Failed to start tournament:", resp);
-            reject(resp);
-        });})
+    async getPlayers() {
+        try {
+            console.log("Getting players");
+            let resp = await socketService.push("get_players", {});
+            return resp.players;
+        } catch (error) {
+            console.log("Failed to get players:", error);
+            throw error;
+        }
     },
-    getStandings(channel) { 
+
+    async getStandings() {
+        try {
+            let resp = await socketService.push("get_standings", {});
+            console.log("Standings found:", resp);
+            return resp.players;
+        } catch (error) {
+            console.error("Failed to get standings:", error);
+            throw error;
+        }
+    },
+
+    async addUserToPlayersList(player) {
+        try {
+            let res = await socketService.push("add_player", { user_id: player.id, deck: player.deck });
+            console.log("Player added:", res.player);
+            return res.player;
+        } catch (error) {
+            alert("Failed to add player:", error);
+            throw error;
+        }
+    },
+
+    async getUserByEmail(email) {
+        try {
+            let resp = await socketService.push("get_user_by_email", { email: email });
+            console.log("Player found:", resp.user_id);
+            return resp.user_id;
+        } catch (error) {
+            console.error("Failed to find player:", error);
+            throw error;
+        }
+    },
+
+    async removePlayer(player, addedPlayers) {
+        try {
+            console.log("Removing player:", player);
+            await socketService.push("remove_player", { player_id: player.id });
             
-            return new Promise ((resolve, reject) => {
-            channel.push("get_standings", {}).receive("ok", (resp) => {
-                console.log("Standings found:", resp);
-                resolve(resp.players);
-        
-        
-        }) .receive("error", (resp) => {
-                console.error("Failed to get standings:", resp);
-                reject(resp);
-            });})
+            addedPlayers.splice(addedPlayers.findIndex(p => p.id == player.id), 1);
+        } catch (error) {
+            console.error("Failed to remove player:", error);
+            throw error;
+        }
     },
 
-    addUserToPlayersList(player, channel, addedPlayers) {
-        channel.push("add_player",{user_id: player.id, deck: player.deck})
-        .receive("ok", (resp) => {
-            console.log("Player added:", resp);
-            addedPlayers.push(resp.player)
-        })
-        .receive("error", (resp) => {
-            console.error("Failed to add player:", resp);
-        });
-    },
-    getUserByEmail(email, channel) {
-        return new Promise((resolve, reject) => {
-            channel.push("get_user_by_email", { email: email })
-            .receive("ok", (resp) => {
-                console.log("Player found:", resp.user_id);
-                resolve(resp.user_id);
-            })
-            .receive("error", (resp) => {
-                console.error("Failed to find player:", resp);
-                reject(resp);
-            });
-        });
-    },
-    removePlayer(player, channel, addedPlayers) {
-        console.log("Removing player:", player);
-        channel.push("remove_player",{player_id: player.id})
-        .receive("ok", (resp) => {
-            console.log("Player removed:", resp);
-            addedPlayers.splice(addedPlayers.findIndex(p => p.id === resp.id), 1)
-        })
-        .receive("error", (resp) => {
-            console.error("Failed to remove player:", resp);
-        });
-    },
-    prepareRound(channel) {
-        return new Promise((resolve, reject) =>
-        channel.push("prepare_matches")
-        .receive("ok", (resp) => {
+    async prepareRound() {
+        try {
+            let resp = await socketService.push("prepare_matches", {});
             console.log("Tournament started:", resp);
-            resolve(resp);
-        })
-        .receive("error", (resp) => {
-            console.error("Failed to start tournament:", resp);
-            resp.redirect==true ? window.location.href = "/tournament" : null;
-            reject(resp);
-        }));
+            return resp;
+        } catch (error) {
+            console.error("Failed to start tournament:", error);
+            if (error.redirect) {
+                window.location.href = "/tournament";
+            }
+            throw error;
+        }
     },
-   getCurrentMatches(channel) {
-       return new Promise((resolve, reject ) => 
-        channel.push("current_matches")
-       .receive("ok", (resp) => {
-           console.log("Matches found:", resp.matches);
-           resolve(resp.matches);
-          
-           
-       })
-       .receive("error", (resp) => {
-           console.error("Failed to get matches:", resp);
-           reject(resp);
-       }));
+
+    async getCurrentMatches() {
+        try {
+            let resp = await socketService.push("current_matches", {});
+            console.log("Matches found:", resp.matches);
+            return resp.matches;
+        } catch (error) {
+            console.error("Failed to get matches:", error);
+            throw error;
+        }
     },
-    updateMatch(channel, match_params) {
-        return new Promise ((resolve, reject ) => channel.push("update_match", match_params)
-        .receive("ok", (resp) => {
+
+    async updateMatch(match_params) {
+        try {
+            let resp = await socketService.push("update_match", match_params);
             console.log("Match updated:", resp);
-            resolve(resp);
-        })
-        .receive("error", (resp) => {
-            console.error("Failed to update match:", resp);
-            reject(resp);
-        }));
+            return resp;
+        } catch (error) {
+            console.error("Failed to update match:", error);
+            throw error;
+        }
     }
-}
-export {tournament_channel};
+};
+
+export { tournament_channel };

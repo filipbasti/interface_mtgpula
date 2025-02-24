@@ -24,7 +24,7 @@
                     </h2>
                     <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
-                            <MatchDetails :match="match" :channel="channel" @update-match="updateMatch" />
+                            <MatchDetails :match="match" @update-match="updateMatch" />
                         </div>
                     </div>
                 </div>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import socket from '../warehouse/socket';
+import socketService from '../warehouse/socketService';
 import { tournament_channel } from '../warehouse/tournament_channel';
 import { auth } from '../warehouse/auth';
 import MatchDetails from '../components/MatchDetails.vue';
@@ -67,7 +67,7 @@ export default {
         },
         async getStandings() {
             try {
-                let standings = await tournament_channel.getStandings(this.channel);
+                let standings = await tournament_channel.getStandings();
                 console.log(standings);
                 this.standings = standings;
                 return standings;
@@ -77,7 +77,7 @@ export default {
         },
         async getAllMatches() {
             try {
-                let matches = await tournament_channel.getCurrentMatches(this.channel);
+                let matches = await tournament_channel.getCurrentMatches();
                 console.log(matches);
                 this.matches = matches.map(match => {
                     match.player1OnPlay = match.on_play_id === match.player1.id;
@@ -92,43 +92,45 @@ export default {
         async updateMatch(params) {
             try {
                 console.log("Updating match:", params);
-                await tournament_channel.updateMatch(this.channel, params);
+                await tournament_channel.updateMatch(params);
             } catch (error) {
                 console.error("Error updating match:", error);
             }
         },
         async goToNextRound() {
-            // Logic to go to the next round
-            console.log("Going to the next round");
-            await tournament_channel.prepareRound(this.channel);
-            this.matches = await this.getAllMatches();
+            try {
+                console.log("Going to the next round");
+                await tournament_channel.prepareRound();
+                this.matches = await this.getAllMatches();
+            } catch (error) {
+                console.error("Error going to the next round:", error);
+            }
         }
     },
     async mounted() {
         await this.getCurrentUser();
         this.joinCode = this.$route.params.join_code;
-        this.channel = socket.channel(`tournament:${this.$route.params.join_code}`);
-        this.channel
-            .join()
-            .receive("ok", (resp) => {
-                console.log("Joined successfully", resp);
-                // You might receive initial active users list here
-                if (resp.users) {
-                    this.activeUsers = resp.users;
-                }
-            })
-            .receive("error", (resp) => {
-                console.log("Unable to join", resp);
-            });
+        try {
+            let res = await socketService.joinChannel(`tournament:${this.joinCode}`, {});
+            if (res.users) {
+                this.activeUsers = res.users;
+            }
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.channel = socketService.channel;
+
         this.channel.on("matches_prepared", (payload) => {
             console.log("Matches prepared:", payload);
-            // Handle the matches prepared event
-            // For example, you might want to update the state or notify the user
+            this.getAllMatches();
         });
+
         this.channel.on("match_updated", (payload) => {
             console.log("Match updated:", payload);
             this.getStandings();
         });
+
         this.matches = await this.getAllMatches();
         await this.getStandings();
     }
