@@ -20,10 +20,10 @@
                                 <h3>Player 1: {{ currentMatch.player1.user.full_name }}</h3>
                                 <div class="mb-3">
                                     <label for="player1Score" class="form-label">Player 1 Score:</label>
-                                    <input type="number" v-model="currentMatch.player_1_wins" id="player1Score" class="form-control" :disabled=" currentMatch.player2.id == null == null" />
+                                    <input type="number" v-model="currentMatch.player_1_wins" id="player1Score" class="form-control" :disabled="currentMatch.player2.id == null" />
                                 </div>
                                 <div class="form-check mb-3">
-                                    <input type="checkbox" v-model="player1OnPlay" id="player1OnPlay" class="form-check-input" :disabled=" currentMatch.player2.id == null == null"/>
+                                    <input type="checkbox" v-model="player1OnPlay" id="player1OnPlay" class="form-check-input" :disabled="currentMatch.player2.id == null" />
                                     <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
                                 </div>
                             </div>
@@ -31,15 +31,15 @@
                                 <h3>Player 2: {{ currentMatch.player2.user.full_name }}</h3>
                                 <div class="mb-3">
                                     <label for="player2Score" class="form-label">Player 2 Score:</label>
-                                    <input type="number" v-model="currentMatch.player_2_wins" id="player2Score" class="form-control" :disabled=" currentMatch.player2.id == null == null"/>
+                                    <input type="number" v-model="currentMatch.player_2_wins" id="player2Score" class="form-control" :disabled="currentMatch.player2.id == null" />
                                 </div>
                                 <div class="form-check mb-3">
-                                    <input type="checkbox" v-model="player2OnPlay" id="player2OnPlay" class="form-check-input" :disabled=" currentMatch.player2.id == null == null"/>
+                                    <input type="checkbox" v-model="player2OnPlay" id="player2OnPlay" class="form-check-input" :disabled="currentMatch.player2.id == null" />
                                     <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled=" currentMatch.player2.id == null">Submit Scores</button>
+                        <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled="currentMatch.player2.id == null">Submit Scores</button>
                     </div>
                 </div>
                 <div v-else class="card shadow-sm mt-4">
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import socket from '../warehouse/socket';
+import socketService from '../warehouse/socketService';
 import { tournament_channel } from '../warehouse/tournament_channel';
 import { auth } from '../warehouse/auth';
 import StandingsTable from '../components/StandingsTable.vue';
@@ -98,10 +98,8 @@ export default {
         }
     },
     methods: {
-        settingFlag(player1wins, player2wins){
-            if (player1wins == 0 && player2wins == 0){
-                return true;
-            }
+        settingFlag(player1wins, player2wins) {
+            return player1wins === 0 && player2wins === 0;
         },
         async getCurrentUser() {
             try {
@@ -113,11 +111,11 @@ export default {
         },
         async getCurrentPlayerMatch() {
             try {
-                let matches = await tournament_channel.getCurrentMatches(this.channel);
+                let matches = await tournament_channel.getCurrentMatches();
                 let match = matches.find(match => match.player1.user.id === this.authenticated.user.id || match.player2.user.id === this.authenticated.user.id);
                 console.log(match);
                 this.currentMatch = match;
-                this.currentMatch.on_play_id == match.player1.id ? this.player1OnPlay = true : this.player2OnPlay = true;
+                this.currentMatch.on_play_id === match.player1.id ? this.player1OnPlay = true : this.player2OnPlay = true;
                 this.updateMatchFlag = this.settingFlag(this.currentMatch.player_1_wins, this.currentMatch.player_2_wins);
                 return match;
             } catch (e) {
@@ -126,7 +124,7 @@ export default {
         },
         async getStandings() {
             try {
-                let standings = await tournament_channel.getStandings(this.channel);
+                let standings = await tournament_channel.getStandings();
                 console.log(standings);
                 this.standings = standings;
                 return standings;
@@ -142,43 +140,44 @@ export default {
                     player_2_wins: this.currentMatch.player_2_wins,
                     on_play_id: this.player1OnPlay ? this.currentMatch.player1.id : this.currentMatch.player2.id
                 };
-              
+
                 console.log("Submitting scores:", params);
-                await tournament_channel.updateMatch(this.channel, params);
+                await tournament_channel.updateMatch(params);
             } catch (error) {
                 console.error("Error submitting scores:", error);
             }
         },
         startTournament() {
-            tournament_channel.startTournament(this.channel);
+            tournament_channel.startTournament();
         }
     },
     async mounted() {
         await this.getCurrentUser();
         this.joinCode = this.$route.params.join_code;
-        this.channel = socket.channel(`tournament:${this.$route.params.join_code}`, {deck: this.$route.query.deck});
-        this.channel
-            .join()
-            .receive("ok", (resp) => {
-                console.log("Joined successfully", resp);
-                // You might receive initial active users list here
-                if (resp.users) {
-                    this.activeUsers = resp.users;
-                }
-            })
-            .receive("error", (resp) => {
-                console.log("Unable to join", resp);
-            });
-        this.channel.on("matches_prepared", (payload) => {
+        try {
+            let res = await socketService.joinChannel(`tournament:${this.joinCode}`, { deck: this.$route.query.deck });
+            if (res.users) {
+                this.activeUsers = res.users;
+            }
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.channel = socketService.channel;
+
+        this.channel.on("matches_prepared", async (payload) => {
             console.log("Matches prepared:", payload);
-          
-            this.currentMatch = this.getCurrentPlayerMatch();
+            await this.getCurrentPlayerMatch();
+           await this.getStandings()
         });
-        this.channel.on("match_updated", (payload) => {
+
+        this.channel.on("match_updated", async (payload) => {
             console.log("Match updated:", payload);
             if (payload.id === this.currentMatch.id) this.updateMatchFlag = false;
-            this.getStandings();
+            let res = await this.getStandings();
+            console.log(res);   
         });
+
         this.currentMatch = await this.getCurrentPlayerMatch();
         await this.getStandings();
     }
