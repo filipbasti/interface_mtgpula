@@ -8,13 +8,25 @@ class SocketService {
         this.presence = null;
     }
 
+
+  disconnect() {
+        if (this.socket) {
+            console.log("Disconnecting socket...");
+            this.socket.disconnect();
+            this.socket = null;
+        }
+    }	
     connect(userToken) {
-        this.socket = new Socket("ws://localhost:4000/socket", { params: { token: userToken } });
+        this.socket = new Socket("ws://localhost:4000/socket", { params: { token: userToken },
+         logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data); } // Enable debugging
+         });
+
         this.socket.connect();
     }
 
     async reconnect() {
         try {
+            console.log("Refreshing token...");
             const newToken = await auth.refreshToken();
             this.connect(newToken);
         } catch (error) {

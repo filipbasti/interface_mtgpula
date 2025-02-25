@@ -13,9 +13,11 @@ Service.interceptors.response.use(
   },
   (error) => {
     if (error.response.status == 401) {
-      auth.refreshToken();
-    }
-     console.error('Interceptor', error.response);
+
+      socketService.disconnect();
+      auth.logout();
+      $router.go();
+    } 
   }
 );
 
@@ -36,12 +38,13 @@ const auth = {
   async refreshToken() {
     try{
     let response = await Service.post("/accounts/refresh_session", {}, getAuthConfig());
-    localStorage.setItem("token", response.token);
-    $router.go();
-    return response.token;
+   
+    localStorage.setItem("token", response.data.token);
+    console.log('Token refreshed', response.data.token);
+    return response.data.token;
     }
     catch(error){
-      auth.logout();
+      await auth.logout();
       $router.go();
       throw error;
      }
@@ -77,7 +80,8 @@ const auth = {
     catch(error){ console.error('Current user error:', 
       error.response?.data || error);}
   },
-  logout() {
+  async logout() {
+     socketService.disconnect();
     localStorage.removeItem("token");
   },
   getUser() {

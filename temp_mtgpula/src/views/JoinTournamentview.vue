@@ -48,7 +48,8 @@ export default {
     data(){
         return{
            adminCode: "",
-           playerRoomCode: ""
+           playerRoomCode: "",
+           playerDeck: ""
         } 
     },
 };

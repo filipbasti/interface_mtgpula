@@ -68,11 +68,10 @@ export default {
         async getStandings() {
             try {
                 let standings = await tournament_channel.getStandings();
-                console.log(standings);
                 this.standings = standings;
                 return standings;
             } catch (e) {
-                console.error(e);
+                alert(e);
             }
         },
         async getAllMatches() {
@@ -86,7 +85,7 @@ export default {
                 });
                 return matches;
             } catch (e) {
-                console.error(e);
+                alert(e);
             }
         },
         async updateMatch(params) {
@@ -94,7 +93,7 @@ export default {
                 console.log("Updating match:", params);
                 await tournament_channel.updateMatch(params);
             } catch (error) {
-                console.error("Error updating match:", error);
+               alert(error);
             }
         },
         async goToNextRound() {
@@ -103,7 +102,7 @@ export default {
                 await tournament_channel.prepareRound();
                 this.matches = await this.getAllMatches();
             } catch (error) {
-                console.error("Error going to the next round:", error);
+              alert(error);
             }
         }
     },
@@ -116,7 +115,7 @@ export default {
                 this.activeUsers = res.users;
             }
         } catch (e) {
-            console.log(e);
+           alert(e);
         }
 
         this.channel = socketService.channel;
@@ -128,6 +127,7 @@ export default {
 
         this.channel.on("match_updated", (payload) => {
             console.log("Match updated:", payload);
+            this.getAllMatches();
             this.getStandings();
         });
 
