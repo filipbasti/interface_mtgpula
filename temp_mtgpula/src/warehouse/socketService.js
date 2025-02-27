@@ -6,29 +6,29 @@ class SocketService {
         this.socket = null;
         this.channel = null;
         this.presence = null;
+        this.lastToken = null;
     }
 
 
-  disconnect() {
+  async disconnectSocket() {
         if (this.socket) {
-            console.log("Disconnecting socket...");
             this.socket.disconnect();
-            this.socket = null;
-        }
-    }	
-    connect(userToken) {
-        this.socket = new Socket("ws://localhost:4000/socket", { params: { token: userToken },
-         logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data); } // Enable debugging
-         });
-
+        
+        
+    }	}
+    connectSocket(userToken) {
+        this.socket = new Socket("ws://localhost:4000/socket", { params: { token: userToken },});
+         localStorage.setItem("socket", this.socket);
         this.socket.connect();
     }
 
-    async reconnect() {
+    async reconnectSocket(newToken = null) {
         try {
-            console.log("Refreshing token...");
-            const newToken = await auth.refreshToken();
-            this.connect(newToken);
+            console.log("Reconnecting socket with new token!");
+           if (this.socket) this.disconnectSocket();
+            newToken = newToken || auth.getUser()
+        
+            this.connectSocket(newToken);
         } catch (error) {
             console.error("Failed to refresh token:", error);
             auth.logout();

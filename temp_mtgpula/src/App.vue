@@ -48,24 +48,15 @@
 <script>
 import { authenticated } from './warehouse/store'
 import { auth } from './warehouse/auth'
-import socketService from './warehouse/socketService'
+
 export default {
   data() {
     return { authenticated }
   },
  async mounted() {
-    const token = localStorage.getItem('token');
-if (token) {
-    try{
    
-    socketService.connect(token);
-    
 
-    }catch(error){
-        console.error('Failed to connect to socket:', error );
-       
-    }
-}
+
   },
   methods:{
     logout(){

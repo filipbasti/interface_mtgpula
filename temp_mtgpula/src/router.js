@@ -8,7 +8,7 @@ import CurrenTourView from './views/CurrenTourView.vue'
 import JoinTournamentview from './views/JoinTournamentview.vue'
 import { authenticated } from './warehouse/store'
 import PlayerRoom from './views/PlayerRoomView.vue'
-import Lobby from './views/LobbyView.vue'
+
 import OrganiserRoomView from './views/OrganiserRoomView.vue';
 
 const routes = [
@@ -19,7 +19,7 @@ const routes = [
   { path: '/tournament/active/:join_code', name: 'CurrenTour', component: CurrenTourView},
   {path: '/tournament/join', name: 'JoinTournament', component: JoinTournamentview},
   { path: '/player-room/:join_code', name: 'PlayerRoom', component: PlayerRoom} ,
-  { path: '/lobby', name: 'Lobby', component: Lobby},
+ 
   {
     path: '/organiser-room/:join_code',
     name: 'OrganiserRoomView',

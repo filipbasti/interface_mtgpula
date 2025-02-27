@@ -8,16 +8,21 @@ let Service = axios.create({
   withCredentials: true,
 });
 Service.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response.status == 401) {
-
-      socketService.disconnect();
-      auth.logout();
-      $router.go();
-    } 
+  response => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      try {
+        // Refresh token function
+        error.config.headers["Authorization"] = `Bearer ${newToken}`;
+        await auth.refreshToken();
+        socketService.reconnectSocket(newToken);
+        return Service.request(error.config);
+      } catch (refreshError) {
+        console.error("Token refresh failed", refreshError);
+        auth.logout(); // Handle logout
+      }
+    }
+    return Promise.reject(error);
   }
 );
 
@@ -35,18 +40,69 @@ const getAuthConfig = () => {
 };
 const auth = {
 
+  constructor() { 
+    this.refreshTimer = null;
+  },
+
+  startTokenRefreshTimer() {
+    if (this.refreshTimer) {
+      console.log("[DEBUG] Token refresh timer already running, skipping.");
+      return;
+    }
+  
+    const currentToken = this.getUser();
+    if (!currentToken) return;
+  
+    const decoded = JSON.parse(atob(currentToken.split(".")[1]));
+    console.log (decoded);
+    const expiresAt = decoded.exp 
+    console.log("[DEBUG] Token expires at:", new Date(expiresAt * 1000).toLocaleString());
+    const now = Date.now()/1000;
+    const delay = expiresAt -now- 30 ; // Refresh 30s before expiration
+  
+    console.log(`[DEBUG] Starting token refresh timer in ${delay / 1000}s...`);
+  
+    this.refreshTimer = setTimeout(async () => {
+      this.refreshTimer = null;
+      await this.refreshToken();
+       // Reset timer after refresh
+    }, delay*1000);
+
+    
+  },
   async refreshToken() {
     try{
-    let response = await Service.post("/accounts/refresh_session", {}, getAuthConfig());
-   
-    localStorage.setItem("token", response.data.token);
-    console.log('Token refreshed', response.data.token);
-    return response.data.token;
+      const currentToken = this.getUser();
+      console.log("[DEBUG] Refreshing token... Current token:", currentToken);
+        if (!currentToken) {
+          console.log("[DEBUG] No token found, stopping refresh.");
+          return;}
+        let response = await Service.post("/accounts/refresh_session", {}, getAuthConfig());
+        let newToken = response.data.token;
+
+        if (!newToken) {
+          console.log("[ERROR] Refresh failed: No new token received.");
+          this.logout();
+          return;
+        }
+        if (newToken === currentToken) {
+          console.log("[DEBUG] Token is the same as before. No need to restart.");
+          return; // Prevent loop
+        }
+    
+        console.log("[DEBUG] Token refreshed successfully:", newToken);
+
+        localStorage.setItem("token", newToken);
+
+
+    socketService.reconnectSocket(newToken);
+    this.startTokenRefreshTimer();
+    return newToken;
     }
     catch(error){
       await auth.logout();
       $router.go();
-      throw error;
+      return null;
      }
 
   },
@@ -56,7 +112,8 @@ const auth = {
     );
     let user = response.data;
     localStorage.setItem("token", user.token);
-    socketService.connect(user.token);
+    socketService.connectSocket(user.token);
+    this.startTokenRefreshTimer();
 
     return true;
   },
@@ -81,7 +138,7 @@ const auth = {
       error.response?.data || error);}
   },
   async logout() {
-     socketService.disconnect();
+     socketService.disconnectSocket();
     localStorage.removeItem("token");
   },
   getUser() {
