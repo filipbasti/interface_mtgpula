@@ -1,7 +1,7 @@
 import axios from "axios";
 import $router from "../router";
 import socketService from "./socketService";
-const baseURL = "http://localhost:4000/api";
+const baseURL = "https://mtg-pula.onrender.com/api";
 let Service = axios.create({
   baseURL: baseURL,
   timeout: 10000000,
