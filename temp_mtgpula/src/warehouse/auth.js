@@ -8,6 +8,7 @@ let Service = axios.create({
   baseURL: baseURL,
   timeout: 10000000,
   withCredentials: true,
+   "Content-Type": "application/json"
 });
 
 // Attach token to all requests
@@ -119,7 +120,7 @@ const auth = {
   },
 
   authenticated() {
-    return !!this.getUser();
+    return this.getUser();
   }
 };
 
