@@ -7,8 +7,11 @@ const baseURL = "https://mtg-pula.onrender.com/api";
 let Service = axios.create({
   baseURL: baseURL,
   timeout: 10000000,
-
-   "Content-Type": "application/json"
+ 
+  headers: {
+    withCredentials: true,
+    "Content-Type": "application/json",
+  },
 });
 
 // Attach token to all requests
