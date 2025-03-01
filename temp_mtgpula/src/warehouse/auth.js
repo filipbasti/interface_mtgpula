@@ -33,7 +33,7 @@ const getAuthConfig = () => {
   
   return {
       headers: {
-          Authorization: token
+          Authorization: `Bearer ${token}`
           
       }
   };
