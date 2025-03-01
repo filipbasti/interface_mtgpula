@@ -18,7 +18,6 @@ class SocketService {
     }	}
     connectSocket(userToken) {
         this.socket = new Socket("wss://mtg-pula.onrender.com/socket", { params: { token: userToken },});
-         localStorage.setItem("socket", this.socket);
         this.socket.connect();
     }
 
