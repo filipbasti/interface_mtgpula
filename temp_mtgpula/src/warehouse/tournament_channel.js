@@ -1,5 +1,7 @@
 import socketService from "./socketService";
-
+import  router  from "../router";
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const tournament_channel = {
     async getPlayers() {
         try {
@@ -12,9 +14,10 @@ const tournament_channel = {
         }
     },
 
-    async getStandings() {
+    async getStandings(join_code =null) {
         try {
-            let resp = await socketService.push("get_standings", {});
+            let params = join_code ? { join_code: join_code } : {};
+            let resp = await socketService.push("get_standings", params);
             console.log("Standings found:", resp);
             return resp.players;
         } catch (error) {
@@ -22,6 +25,7 @@ const tournament_channel = {
             throw error;
         }
     },
+
 
     async addUserToPlayersList(player) {
         try {
@@ -57,7 +61,7 @@ const tournament_channel = {
         }
     },
 
-    async prepareRound() {
+    async prepareRound(join_code =null) {
         try {
             let resp = await socketService.push("prepare_matches", {});
             console.log("Tournament started:", resp);
@@ -65,7 +69,7 @@ const tournament_channel = {
         } catch (error) {
             console.error("Failed to start tournament:", error);
             if (error.redirect) {
-                window.location.href = "/tournament";
+                router.push(`/final-standings/${join_code}`);
             }
             throw error;
         }

@@ -10,13 +10,11 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <router-link class="nav-link active" aria-current="page" to="/">Home</router-link>
+          <router-link class="nav-link active" aria-current="page" to="/" v-if="authenticated" >Home</router-link>
         </li>
+     
         <li class="nav-item">
-          <router-link class="nav-link" to="/about">About</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/tournament/join">Tournament</router-link>
+          <router-link class="nav-link" to="/tournament/join" v-if="authenticated">Tournament</router-link>
         </li>
        
       </ul>
@@ -24,8 +22,7 @@
         <li class="dropdown " v-if="authenticated">
           <img class="nav-link dropdown-toggle rounded-circle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" src="https://github.com/twbs.png" alt="Bootstrap" style="width: 3rem" >
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
+            
             <li><a class="dropdown-item" href="#" @click="logout">Logout</a></li>
           </ul>
         </li>

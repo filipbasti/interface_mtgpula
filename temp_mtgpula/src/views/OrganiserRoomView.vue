@@ -99,7 +99,7 @@ export default {
         async goToNextRound() {
             try {
                 console.log("Going to the next round");
-                await tournament_channel.prepareRound();
+                await tournament_channel.prepareRound(this.joinCode);
                 this.matches = await this.getAllMatches();
             } catch (error) {
               alert(error);

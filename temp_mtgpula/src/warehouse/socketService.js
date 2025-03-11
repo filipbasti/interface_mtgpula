@@ -17,7 +17,7 @@ class SocketService {
         
     }	}
     connectSocket(userToken) {
-        this.socket = new Socket("wss://mtg-pula.onrender.com/socket", { params: { token: userToken },});
+        this.socket = new Socket("ws://localhost:4000/socket", { params: { token: userToken },});
         this.socket.connect();
     }
 
