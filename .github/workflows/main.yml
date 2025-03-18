@@ -42,7 +42,7 @@ jobs:
         with:
           host: ${{ secrets.HETZNER_SERVER_IP }}
           username: ${{ secrets.HETZNER_SERVER_USER }}
-          key: ${{ secrets.HETZNER_SERVER_SSH_KEY }}
+          key: ${{ secrets.HETZNER_PASSWORD }}
           script: |
             docker pull your-dockerhub-username/your-app-name:latest
             docker stop your-app-name || true
