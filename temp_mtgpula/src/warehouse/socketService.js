@@ -1,6 +1,8 @@
 import { Socket, Presence } from "phoenix";
 import { auth } from "./auth";
-
+const baseURL = process.env.NODE_ENV === "development"
+  ? "ws://localhost:4000/api" // Local development
+  : "ws://mtg_pula:4000/api"; // Production
 class SocketService {
     constructor() {
         this.socket = null;
@@ -17,7 +19,7 @@ class SocketService {
         
     }	}
     connectSocket(userToken) {
-        this.socket = new Socket("ws://localhost:4000/socket", { params: { token: userToken },});
+        this.socket = new Socket(baseURL, { params: { token: userToken },});
         this.socket.connect();
     }
 
