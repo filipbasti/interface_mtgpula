@@ -42,7 +42,7 @@ jobs:
         with:
           host: ${{ secrets.HETZNER_SERVER_IP }}
           username: ${{ secrets.HETZNER_SERVER_USER }}
-          key: ${{ secrets.HETZNER_PASSWORD }}
+          password: ${{ secrets.HETZNER_PASSWORD }}
           script: |
             docker pull filipbasti/mtg_frontend:latest
             docker stop your-app-name || true
