@@ -6,8 +6,12 @@
                 <div class="col-md-6">
                     <h4>Player 1: {{ match.player1.user.full_name }}</h4>
                     <div class="mb-3">
-                        <label for="player1Score" class="form-label">Player 1 Score:</label>
-                        <input type="number" v-model="match.player_1_wins" id="player1Score" class="form-control" :disabled="match.player2.id == null" />
+                        <label class="form-label text-center w-100 h5">Player 1 Score:</label>
+                        <div class="input-group px-5 row">
+                            <button class="btn btn-outline-secondary col" @click="decrementScore('player1')" :disabled="match.player2.id == null">-</button>
+                            <span class="form-control text-center col fs-3" >{{ match.player_1_wins }}</span>
+                            <button class="btn btn-outline-secondary col" @click="incrementScore('player1')" :disabled="match.player2.id == null">+</button>
+                        </div>
                     </div>
                     <div class="form-check mb-3">
                         <input type="checkbox" v-model="match.player1OnPlay" @change="handleOnPlayChange('player1')" id="player1OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
@@ -17,8 +21,12 @@
                 <div class="col-md-6">
                     <h4>Player 2: {{ match.player2.user.full_name }}</h4>
                     <div class="mb-3">
-                        <label for="player2Score" class="form-label">Player 2 Score:</label>
-                        <input type="number" v-model="match.player_2_wins" id="player2Score" class="form-control" :disabled=" match.player2.id == null" />
+                        <label class="form-label text-center w-100 h5">Player 2 Score:</label>
+                        <div class="input-group px-5 row">
+                            <button class="btn btn-outline-secondary col" @click="decrementScore('player2')" :disabled="match.player2.id == null">-</button>
+                            <span class="form-control text-center col fs-3">{{ match.player_2_wins }}</span>
+                            <button class="btn btn-outline-secondary col" @click="incrementScore('player2')" :disabled="match.player2.id == null">+</button>
+                        </div>
                     </div>
                     <div class="form-check mb-3">
                         <input type="checkbox" v-model="match.player2OnPlay" @change="handleOnPlayChange('player2')" id="player2OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
@@ -48,6 +56,20 @@ export default {
                 if (this.match.player2OnPlay) {
                     this.match.player1OnPlay = false;
                 }
+            }
+        },
+        incrementScore(player) {
+            if (player === 'player1' && this.match.player_1_wins < 2) {
+                this.match.player_1_wins++;
+            } else if (player === 'player2' && this.match.player_2_wins < 2) {
+                this.match.player_2_wins++;
+            }
+        },
+        decrementScore(player) {
+            if (player === 'player1' && this.match.player_1_wins > 0) {
+                this.match.player_1_wins--;
+            } else if (player === 'player2' && this.match.player_2_wins > 0) {
+                this.match.player_2_wins--;
             }
         },
         async submitScores() {

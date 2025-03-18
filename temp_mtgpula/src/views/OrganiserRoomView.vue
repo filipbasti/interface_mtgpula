@@ -102,7 +102,7 @@ export default {
                 await tournament_channel.prepareRound(this.joinCode);
                 this.matches = await this.getAllMatches();
             } catch (error) {
-              alert(error);
+              alert("Tournament ended successfully");
             }
         }
     },

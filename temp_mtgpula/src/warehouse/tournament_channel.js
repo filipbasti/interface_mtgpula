@@ -1,7 +1,7 @@
 import socketService from "./socketService";
 import  router  from "../router";
-import { useRoute } from 'vue-router'
-const route = useRoute()
+
+
 const tournament_channel = {
     async getPlayers() {
         try {
@@ -33,7 +33,6 @@ const tournament_channel = {
             console.log("Player added:", res.player);
             return res.player;
         } catch (error) {
-            alert("Failed to add player:", error);
             throw error;
         }
     },
@@ -44,7 +43,7 @@ const tournament_channel = {
             console.log("Player found:", resp.user_id);
             return resp.user_id;
         } catch (error) {
-            console.error("Failed to find player:", error);
+           alert("User not found")
             throw error;
         }
     },

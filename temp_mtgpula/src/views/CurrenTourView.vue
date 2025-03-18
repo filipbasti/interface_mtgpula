@@ -1,34 +1,35 @@
 <template>
     <div class="container mt-4">
+        <h1 class="text-center">Tournament setup</h1>
         <div class="row">
             <div class="col-md-6">
-                <h3 class="text-center">CURRENT Tournament</h3>
+                <div class="mb-4">
+                    <label class="form-label h5">Add player by Email:</label>
+                    <input type="text" v-model="searchEmail" class="form-control mb-3" placeholder="Search by email" @keyup.enter="addUserbyEmail">
+                    <input type="text" v-model="deck" class="form-control" placeholder="Deck"  @keyup.enter="addUserbyEmail">
+                    <button class="btn btn-primary mt-2" @click="addUserbyEmail">Search</button>
+                </div>
                 <div class="card mt-4">
                     <div class="card-header">
-                        <h4>Users applied:</h4>
+                        <h4>Users waiting for approval...</h4>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li v-for="player in activeUsers" :key="player.id" class="list-group-item d-flex justify-content-between align-items-center">
-                          <div class="d-flex  align-items-center w-100">
+                          <div class="d-flex align-items-center w-100">
                             <p class="mb-0 me-2"> {{ player.name }} </p>
                             <div class="d-flex align-items-center">
                               <span class="me-2">Deck:</span>
                               <input type="text" class="form-control me-3" v-model="player.deck" style="width: 150px;">
                             </div>
                           </div>
-                          <button @click="addUserToPlayersList(player)" class="btn btn-sm btn-outline-secondary">Add</button>
+                          <button @click="addUserToPlayersList(player)" class="btn btn-sm btn-outline-secondary ">Add</button>
                         </li>
                     </ul>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="mb-4">
-                    <input type="text" v-model="searchEmail" class="form-control" placeholder="Search by email" @keyup.enter="addUserbyEmail">
-                    <input type="text" v-model="deck" class="form-control" placeholder="Deck"  @keyup.enter="addUserbyEmail">
-                    <button class="btn btn-primary mt-2" @click="addUserbyEmail">Search</button>
-                </div>
                 <PlayerList :players="addedPlayers" @remove-player="removePlayer" />
-                <button class="btn btn-primary mt-4" @click="startTournament">Start Tournament</button>
+                <button class="btn btn-primary mt-4 mx-auto" @click="startTournament">Start Tournament</button>
             </div>
         </div>
     </div>
@@ -101,7 +102,7 @@ export default {
                 console.log("User added to players list:", res);
                 this.addedPlayers.push(res);
             } catch (e) {
-                console.log(e);
+                alert("User already added");
             }
         },
         async removePlayer(player) {
@@ -117,6 +118,7 @@ export default {
                 console.log("User found:", userId);
             } catch (error) {
                 console.error("Error finding user by email:", error);
+                alert(error.reason);
             }
         },
         async addUserbyEmail() {

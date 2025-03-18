@@ -1,10 +1,10 @@
 <template>
     <div class="container">
-        <h1 class="my-4">Game Dashboard</h1>
-        <ul class="list-group">
-            <li v-for="player in players" :key="player.id" class="list-group-item">
+        <h4 class="my-4">Player List:</h4>
+        <ul class="list-group player-list">
+            <li v-for="player in players" :key="player.id" class="list-group-item d-flex justify-content-between align-items-center">
                 {{ player.user.full_name }}
-                <button @click="$emit('remove-player', player)" class="btn btn-danger btn-sm float-end">
+                <button @click="$emit('remove-player', player)" class="btn btn-danger btn-sm">
                    X
                 </button>
             </li>
@@ -25,8 +25,10 @@ export default {
 </script>
 
 <style scoped>
-h1 {
-    font-family: Arial, sans-serif;
+
+
+.player-list {
+    max-height: 25rem; /* Set the height to accommodate 10 instances */
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 </style>
-

@@ -60,7 +60,7 @@ const auth = {
     const now = Date.now()/1000;
     const delay = expiresAt -now- 30 ; // Refresh 30s before expiration
   
-    console.log(`[DEBUG] Starting token refresh timer in ${delay / 1000}s...`);
+    console.log(`[DEBUG] Starting token refresh timer in ${delay}s...`);
   
     this.refreshTimer = setTimeout(async () => {
       this.refreshTimer = null;
