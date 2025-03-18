@@ -45,6 +45,6 @@ jobs:
           password: ${{ secrets.HETZNER_PASSWORD }}
           script: |
             docker pull filipbasti/mtg_frontend:latest
-            docker stop your-app-name || true
-            docker rm your-app-name || true
+            docker stop mtg_frontend || true
+            docker rm mtg_frontend || true
             docker run -d -p 80:80 --name mtg_frontend filipbasti/mtg_frontend:latest
