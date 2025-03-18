@@ -26,9 +26,9 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./temp_mtgpula
           push: true
-          tags: your-dockerhub-username/your-app-name:latest
+          tags: filipbasti/mtg_frontend:latest
 
   deploy:
     name: Deploy to Hetzner
@@ -42,9 +42,9 @@ jobs:
         with:
           host: ${{ secrets.HETZNER_SERVER_IP }}
           username: ${{ secrets.HETZNER_SERVER_USER }}
-          key: ${{ secrets.HETZNER_SERVER_SSH_KEY }}
+          password: ${{ secrets.HETZNER_PASSWORD }}
           script: |
-            docker pull your-dockerhub-username/your-app-name:latest
-            docker stop your-app-name || true
-            docker rm your-app-name || true
-            docker run -d -p 80:80 --name your-app-name your-dockerhub-username/your-app-name:latest
+            docker pull filipbasti/mtg_frontend:latest
+            docker stop mtg_frontend || true
+            docker rm mtg_frontend || true
+            docker run -d -p 80:80 --name mtg_frontend filipbasti/mtg_frontend:latest
