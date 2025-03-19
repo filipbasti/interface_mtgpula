@@ -1,8 +1,8 @@
 import { Socket, Presence } from "phoenix";
 import { auth } from "./auth";
 const baseURL = process.env.NODE_ENV === "development"
-  ? "ws://localhost:4000/api" // Local development
-  : "ws://116.203.210.54:4000/api"; // Production
+  ? "ws://localhost:4000/socket" // Local development
+  : "ws://116.203.210.54:4000/socket"; // Production
 class SocketService {
     constructor() {
         this.socket = null;
