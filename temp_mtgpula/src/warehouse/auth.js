@@ -3,7 +3,7 @@ import $router from "../router";
 import socketService from "./socketService";
 const baseURL = process.env.NODE_ENV === "development"
   ? "http://localhost:4000/api" // Local development
-  : "http://mtg_pula:4000/api"; // Production
+  : "http://116.203.210.54/:4000/api"; // Production
 let Service = axios.create({
   baseURL: baseURL,
   timeout: 10000000,
