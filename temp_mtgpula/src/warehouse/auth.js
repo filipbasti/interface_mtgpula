@@ -142,6 +142,11 @@ const auth = {
   async logout() {
      socketService.disconnectSocket();
     localStorage.removeItem("token");
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = null; // Reset the timer reference
+      console.log("[DEBUG] Refresh timer cleared.");
+    }
   },
   getUser() {
     return localStorage.getItem("token");

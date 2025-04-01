@@ -42,17 +42,13 @@
               </div>
 
               <div class="mb-4 form-check">
-                <input 
-                  type="checkbox" 
-                  class="form-check-input" 
-                  id="rememberMe" 
-                  v-model="rememberMe"
-                />
-                <label class="form-check-label" for="rememberMe">Remember me</label>
-                <router-link to="/forgot-password" class="float-end text-primary text-decoration-none">
+           
+            <!--    <router-link to="/forgot-password" class="float-end text-primary text-decoration-none">
                   Forgot Password?
                 </router-link>
+                   --->
               </div>
+           
 
               <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg" >
