@@ -5,17 +5,16 @@
 1. Data security is not yet fully ensured; therefore, please register using a temporary email, username, and password.
 2. Enter your username, email, and password twice.
 3. Log in using the credentials you have set up.
-![alt text](public/image.png)
+![alt text](public/Login.png)
 4. Click on "Tournament" to proceed.
 
 ## Organizer Use Case
 
 5. Choose either "Create Tournament" or join an existing tournament using the provided code.
-![alt text](public/image-1.png)
+![alt text](public/image.png)
 6. Add the number of rounds and start the tournament.
-![alt text](public/image-2.png)
 7. You have entered organizer mode.
-![alt text](public/image-3.png)
+![alt text](public/image-2.png)
 8. Upon joining, participants will be displayed similarly to the Companion app when someone joins a tournament, under "User Waiting for Approval."
 9. You can add participants via email. (For testing purposes, accounts such as [test@test.hr](mailto:test@test.hr) and [test8@test.hr](mailto:test8@test.hr) have been used.)
 10. Players can be removed using the "X" button if necessary.
@@ -25,7 +24,7 @@
 
 12. Standings will be displayed in real time.
 13. Each match round should be updated as results are reported. Once all results are submitted, the system will move to the next round. Please ensure accurate score reporting until a fixed best-of-three (Bo3) format is implemented.
-![alt text](public/image-4.png)
+![alt text](public/image-3.png)
 
 ## Player Use Case
 
@@ -33,7 +32,7 @@
 15. To join a tournament, visit: [http://116.203.210.54/tournament/join](http://116.203.210.54/tournament/join)
 16. Join using the tournament code, which is typically found in the organizer’s URL.
 17. After joining, a participant view will be available.
-![alt text](public/image-5.png)
+![alt text](public/image-4.png)
 18. Live standings will be continuously updated.
 19. A waiting screen will be displayed while results are being processed.
 20. The current interface is under development, and improvements to the frontend are in progress.
