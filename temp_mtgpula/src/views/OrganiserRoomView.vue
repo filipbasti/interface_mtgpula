@@ -92,6 +92,8 @@ export default {
             try {
                 console.log("Updating match:", params);
                 await tournament_channel.updateMatch(params);
+                let standings = await tournament_channel.getStandings();
+                this.standings = standings;
             } catch (error) {
                alert(error);
             }
