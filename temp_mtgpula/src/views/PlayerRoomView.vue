@@ -12,36 +12,7 @@
         </ul>
         <div class="tab-content" id="playerRoomTabsContent">
             <div class="tab-pane fade show active" id="match" role="tabpanel" aria-labelledby="match-tab">
-                <div v-if="currentMatch && updateMatchFlag" class="card shadow-sm mt-4">
-                    <div class="card-body">
-                        <h2 class="card-title">Match Details</h2>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h3>Player 1: {{ currentMatch.player1.user.full_name }}</h3>
-                                <div class="mb-3">
-                                    <label for="player1Score" class="form-label">Player 1 Score:</label>
-                                    <input type="number" v-model="currentMatch.player_1_wins" id="player1Score" class="form-control" :disabled="currentMatch.player2.id == null" />
-                                </div>
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" v-model="player1OnPlay" id="player1OnPlay" class="form-check-input" :disabled="currentMatch.player2.id == null" />
-                                    <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h3>Player 2: {{ currentMatch.player2.user.full_name }}</h3>
-                                <div class="mb-3">
-                                    <label for="player2Score" class="form-label">Player 2 Score:</label>
-                                    <input type="number" v-model="currentMatch.player_2_wins" id="player2Score" class="form-control" :disabled="currentMatch.player2.id == null" />
-                                </div>
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" v-model="player2OnPlay" id="player2OnPlay" class="form-check-input" :disabled="currentMatch.player2.id == null" />
-                                    <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled="currentMatch.player2.id == null">Submit Scores</button>
-                    </div>
-                </div>
+                <MatchDetails v-if= "updateMatchFlag && currentMatch" :match="currentMatch" @update-match="submitScores" />
                 <div v-else class="card shadow-sm mt-4">
                     <div class="card-body">
                         <h2 class="card-title">Waiting for organiser to start a new round</h2>
@@ -65,12 +36,14 @@
 import socketService from '../warehouse/socketService';
 import { tournament_channel } from '../warehouse/tournament_channel';
 import { auth } from '../warehouse/auth';
+import MatchDetails from '../components/MatchDetails.vue';
 import StandingsTable from '../components/StandingsTable.vue';
 
 export default {
     name: 'PlayerRoomView',
     components: {
-        StandingsTable
+        StandingsTable,
+        MatchDetails
     },
     data() {
         return {

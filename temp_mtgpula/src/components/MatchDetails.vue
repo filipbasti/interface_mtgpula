@@ -14,9 +14,11 @@
                         </div>
                     </div>
                     <div class="form-check mb-3">
+                        
                         <input type="checkbox" v-model="match.player1OnPlay" @change="handleOnPlayChange('player1')" id="player1OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
                         <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
                     </div>
+                    <button class="btn btn-danger btn-sm" @click="drop_player(match.player1)">Drop Player 1</button>
                 </div>
                 <div class="col-md-6">
                     <h4>Player 2: {{ match.player2.user.full_name }}</h4>
@@ -29,9 +31,11 @@
                         </div>
                     </div>
                     <div class="form-check mb-3">
+                        
                         <input type="checkbox" v-model="match.player2OnPlay" @change="handleOnPlayChange('player2')" id="player2OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
                         <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
                     </div>
+                    <button class="btn btn-danger btn-sm" @click="drop_player(match.player2)">Drop Player 2</button>
                 </div>
             </div>
             <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled="match.player2.id == null">Submit Scores</button>
@@ -40,6 +44,7 @@
 </template>
 
 <script>
+import { tournament_channel } from '../warehouse/tournament_channel';
 export default {
     name: 'MatchDetails',
     props: {
@@ -47,6 +52,15 @@ export default {
         channel: Object
     },
     methods: {
+        async drop_player(player) {
+            try {
+                console.log("Dropping player:", player);
+                await tournament_channel.dropPlayer(player);
+                this.matches = await this.getAllMatches();
+            } catch (error) {
+                alert(error);
+            }
+        },
         handleOnPlayChange(player) {
             if (player === 'player1') {
                 if (this.match.player1OnPlay) {

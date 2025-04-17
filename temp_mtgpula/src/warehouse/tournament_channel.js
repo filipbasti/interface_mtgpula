@@ -84,6 +84,16 @@ const tournament_channel = {
             throw error;
         }
     },
+    async dropPlayer(player) {
+        try {
+            console.log("Removing player:", player);
+            await socketService.push("drop_player", { player_id: player.id });
+        } catch (error) {
+            console.error("Failed to remove player:", error);
+            throw error;
+        }
+    }
+    ,
 
     async updateMatch(match_params) {
         try {

@@ -22,6 +22,7 @@
                             Match {{ index + 1 }}: {{ match.player1.user.full_name }} vs {{ match.player2.user.full_name }}
                         </button>
                     </h2>
+                 
                     <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <MatchDetails :match="match" @update-match="updateMatch" />
@@ -74,10 +75,16 @@ export default {
                 alert(e);
             }
         },
+    
         async getAllMatches() {
             try {
                 let matches = await tournament_channel.getCurrentMatches();
                 console.log(matches);
+                matches =matches.sort((a, b) => {
+                    if (a.id < b.id) return -1;
+                    if (a.id > b.id) return 1;
+                    return 0;
+                });
                 this.matches = matches.map(match => {
                     match.player1OnPlay = match.on_play_id === match.player1.id;
                     match.player2OnPlay = match.on_play_id === match.player2.id;
