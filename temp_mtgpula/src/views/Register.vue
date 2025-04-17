@@ -123,7 +123,7 @@ export default {
      await auth.signup(userDetail)
       this.$router.push('/');
       }catch(error){
-        console.error('Error during registration:', error);
+       alert(error);
       }
     }
   }
