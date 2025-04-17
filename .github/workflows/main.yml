@@ -47,4 +47,4 @@ jobs:
             docker pull filipbasti/mtg_frontend:latest
             docker stop mtg_frontend || true
             docker rm mtg_frontend || true
-            docker run -d -p 80:80 --name mtg_frontend --network mtg_network filipbasti/mtg_frontend:latest
+            docker run -d -p 8080:80 --name mtg_frontend --network mtg_network filipbasti/mtg_frontend:latest
