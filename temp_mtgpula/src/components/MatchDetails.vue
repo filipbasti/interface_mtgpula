@@ -18,7 +18,7 @@
                         <input type="checkbox" v-model="match.player1OnPlay" @change="handleOnPlayChange('player1')" id="player1OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
                         <label for="player1OnPlay" class="form-check-label">Player 1 on Play</label>
                     </div>
-                    <button class="btn btn-danger btn-sm" @click="drop_player(match.player1)">Drop Player 1</button>
+                    <button class="btn btn-danger btn-sm" v-if="organiser" @click="drop_player(match.player2)" >Drop Player 1</button>
                 </div>
                 <div class="col-md-6">
                     <h4>Player 2: {{ match.player2.user.full_name }}</h4>
@@ -35,11 +35,12 @@
                         <input type="checkbox" v-model="match.player2OnPlay" @change="handleOnPlayChange('player2')" id="player2OnPlay" class="form-check-input" :disabled="match.player2.id == null" />
                         <label for="player2OnPlay" class="form-check-label">Player 2 on Play</label>
                     </div>
-                    <button class="btn btn-danger btn-sm" @click="drop_player(match.player2)">Drop Player 2</button>
+                    <button class="btn btn-danger btn-sm" v-if= "organiser" @click="drop_player(match.player2)">Drop Player 2</button>
                 </div>
             </div>
             <button class="btn btn-primary mt-4 w-100" @click="submitScores" :disabled="match.player2.id == null">Submit Scores</button>
         </div>
+        <div></div>
     </div>
 </template>
 
@@ -49,7 +50,8 @@ export default {
     name: 'MatchDetails',
     props: {
         match: Object,
-        channel: Object
+        channel: Object,
+        organiser: Boolean
     },
     methods: {
         async drop_player(player) {

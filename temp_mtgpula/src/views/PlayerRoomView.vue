@@ -12,7 +12,7 @@
         </ul>
         <div class="tab-content" id="playerRoomTabsContent">
             <div class="tab-pane fade show active" id="match" role="tabpanel" aria-labelledby="match-tab">
-                <MatchDetails v-if= "updateMatchFlag && currentMatch" :match="currentMatch" @update-match="submitScores" />
+                <MatchDetails v-if= "updateMatchFlag && currentMatch" :match="currentMatch" :organiser="flase" @update-match="submitScores" />
                 <div v-else class="card shadow-sm mt-4">
                     <div class="card-body">
                         <h2 class="card-title">Waiting for organiser to start a new round</h2>

@@ -25,7 +25,7 @@
                  
                     <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
-                            <MatchDetails :match="match" @update-match="updateMatch" />
+                            <MatchDetails :organiser= "true" :match="match" @update-match="updateMatch" />
                         </div>
                     </div>
                 </div>

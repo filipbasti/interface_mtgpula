@@ -9,11 +9,24 @@
                     </div>
                     <ul class="list-group list-group-flush">
                         <li v-for="player in activeUsers" :key="player.id" class="list-group-item d-flex justify-content-between align-items-center">
-                          <div class="d-flex  align-items-center w-100">
+                          <div class="d-flex align-items-center w-100">
                             <p class="mb-0 me-2"> {{ player.name }} </p>
                             <div class="d-flex align-items-center">
                               <span class="me-2">Deck:</span>
-                              <input type="text" class="form-control me-3" v-model="player.deck" style="width: 150px;">
+                              <input 
+                                :type="player.showDeck ? 'text' : 'password'" 
+                                class="form-control me-3" 
+                                v-model="player.deck" 
+                                style="width: 150px;"
+                              >
+                              <button 
+                                @mousedown="player.showDeck = true" 
+                                @mouseup="player.showDeck = false" 
+                                @mouseleave="player.showDeck = false" 
+                                class="btn btn-sm btn-outline-secondary me-3"
+                              >
+                                Hold to Reveal
+                              </button>
                             </div>
                           </div>
                           <button @click="addUserToPlayersList(player)" class="btn btn-sm btn-outline-secondary">Add</button>
@@ -24,7 +37,23 @@
             <div class="col-md-6">
                 <div class="mb-4">
                     <input type="text" v-model="searchEmail" class="form-control" placeholder="Search by email" @keyup.enter="addUserbyEmail">
-                    <input type="text" v-model="deck" class="form-control" placeholder="Deck"  @keyup.enter="addUserbyEmail">
+                    <div class="d-flex align-items-center mt-2">
+                        <input 
+                            :type="showDeckInput ? 'text' : 'password'" 
+                            v-model="deck" 
+                            class="form-control me-2" 
+                            placeholder="Deck" 
+                            @keyup.enter="addUserbyEmail"
+                        >
+                        <button 
+                            @mousedown="showDeckInput = true" 
+                            @mouseup="showDeckInput = false" 
+                            @mouseleave="showDeckInput = false" 
+                            class="btn btn-sm btn-outline-secondary"
+                        >
+                            Hold to Reveal
+                        </button>
+                    </div>
                     <button class="btn btn-primary mt-2" @click="addUserbyEmail">Search</button>
                 </div>
                 <PlayerList :players="addedPlayers" @remove-player="removePlayer" />
@@ -47,17 +76,18 @@ export default {
         return {
             channel: null,
             join_code: this.$route.params.join_code,
-            activeUsers: [],
+            activeUsers: [], // Ensure each player object has a `showDeck` property
             addedPlayers: [],
             searchEmail: "",
-            deck: ""
+            deck: "",
+            showDeckInput: false, // State to toggle deck input visibility
         };
     },
     async mounted() {
         try {
             let res = await socketService.joinChannel(`tournament:${this.join_code}`, {});
             if (res.users) {
-                this.activeUsers = res.users;
+                this.activeUsers = res.users.map(user => ({ ...user, showDeck: false })); // Initialize `showDeck` to false
             }
         } catch (e) {
             console.log(e);
