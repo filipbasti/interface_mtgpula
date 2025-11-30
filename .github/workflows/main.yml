@@ -30,21 +30,4 @@ jobs:
           push: true
           tags: filipbasti/mtg_frontend:latest
 
-  deploy:
-    name: Deploy to Hetzner
-    runs-on: ubuntu-latest
-    needs: build-and-push
 
-    steps:
-      # Step 1: SSH into the Hetzner server and deploy
-      - name: Deploy to Hetzner
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.HETZNER_SERVER_IP }}
-          username: ${{ secrets.HETZNER_SERVER_USER }}
-          password: ${{ secrets.HETZNER_PASSWORD }}
-          script: |
-            docker pull filipbasti/mtg_frontend:latest
-            docker stop mtg_frontend || true
-            docker rm mtg_frontend || true
-            docker run -d -p 8080:80 --name mtg_frontend --network mtg_network filipbasti/mtg_frontend:latest
