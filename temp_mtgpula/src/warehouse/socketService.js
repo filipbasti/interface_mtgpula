@@ -2,7 +2,7 @@ import { Socket, Presence } from "phoenix";
 import { auth } from "./auth";
 const baseURL = process.env.NODE_ENV === "development"
   ? "ws://localhost:4000/socket" // Local development
-  : "wss://www.mtgpula.site:4043/socket"; // Production
+  : "wss://www.mtgpula.site:443/socket"; // Production
 class SocketService {
     constructor() {
         this.socket = null;
